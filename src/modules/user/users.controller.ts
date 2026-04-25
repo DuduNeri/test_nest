@@ -1,15 +1,29 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { InferCreationAttributes } from 'sequelize';
-import { UsersService } from './services/create.users.service';
-import type { User } from './users.model';
+import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { UsersService } from './services/users.service';
+import { CreateUserDto } from '../../dto/create-user.dto';
+import type { IUserResponse } from '../../interfaces/user.interfaces';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly service: UsersService) {}
 
   @Post()
-  create(@Body() body: InferCreationAttributes<User>) {
-    console.log(body);
-    return this.service.create(body);
+  create(@Body() data: CreateUserDto) {
+    return this.service.create(data);
   }
+
+  @Get()
+  getAllUsers(): Promise<IUserResponse[]> {
+    return this.service.getAll();
+  }
+
+  @Get(':id')
+  getUser(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getUserById(id);
+  }
+
+  @Get('ping')
+ping() {
+  return 'ok';
+}
 }
